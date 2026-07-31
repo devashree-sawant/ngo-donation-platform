@@ -1,81 +1,159 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import "../App.css";
 
 function DonorDashboard() {
-    const [needs, setNeeds] = useState([]);
+
     const navigate = useNavigate();
+    const [needs, setNeeds] = useState([]);
 
     useEffect(() => {
-        fetchNeeds();
+        loadNeeds();
     }, []);
 
-    const fetchNeeds = async () => {
+    const loadNeeds = async () => {
         try {
-            const token = localStorage.getItem("token");
 
-            const response = await api.get("/needs", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await api.get("/needs");
 
-            setNeeds(response.data);
-        } catch (error) {
-            console.error(error);
-            alert("Failed to load needs");
+            setNeeds(
+                res.data.filter(n => n.type === "MONEY")
+            );
+
+        } catch {
+
+            alert("Unable to load campaigns");
+
         }
     };
 
-    const logout = () => {
-        localStorage.clear();
-        navigate("/");
-    };
-
     return (
-        <div style={{ padding: "20px" }}>
-            <h1>Donor Dashboard</h1>
 
-            <button onClick={logout}>Logout</button>
+        <div className="container">
 
-            <hr />
+            <div className="top">
 
-            {needs.length === 0 ? (
-                <p>No needs available.</p>
-            ) : (
-                needs.map((need) => (
-                    <div
-                        key={need.id}
-                        style={{
-                            border: "1px solid black",
-                            marginBottom: "15px",
-                            padding: "10px",
-                        }}
-                    >
-                        <h3>{need.title}</h3>
+                <h1>Donor Dashboard</h1>
 
-                        <p>Description: {need.description}</p>
+                <button
+                    className="logout"
+                    onClick={() => {
 
-                        <p>Target: {need.targetAmount}</p>
+                        localStorage.clear();
+                        navigate("/");
 
-                        <p>Current: {need.currentAmount}</p>
+                    }}
+                >
+                    Logout
+                </button>
 
-                        <button
-                            onClick={() =>
-                                navigate("/donate", {
-                                    state: {
-                                        need,
-                                    },
-                                })
-                            }
-                        >
-                            Donate
-                        </button>
-                    </div>
-                ))
-            )}
+            </div>
+
+            <div className="card">
+
+                <h2>Support a Campaign ❤️</h2>
+
+                <p>
+                    Choose a campaign below and make a contribution.
+                </p>
+
+            </div>
+
+            <div className="grid">
+
+                {
+
+                    needs.map((need) => {
+
+                        const progress =
+                            need.targetAmount
+                                ? ((need.currentAmount / need.targetAmount) * 100).toFixed(1)
+                                : 0;
+
+                        return (
+
+                            <div
+                                className="need"
+                                key={need.id}
+                            >
+
+                                <h3>
+
+                                    {need.title}
+
+                                </h3>
+
+                                <p>
+
+                                    {need.description}
+
+                                </p>
+
+                                <p>
+
+                                    <b>NGO:</b>
+
+                                    {" "}
+
+                                    {need.ngo?.name}
+
+                                </p>
+
+                                <p className="amount">
+
+                                    ₹{need.currentAmount}
+
+                                    {" / "}
+
+                                    ₹{need.targetAmount}
+
+                                </p>
+
+                                <div className="progress">
+
+                                    <div
+                                        style={{
+                                            width: `${progress}%`
+                                        }}
+                                    />
+
+                                </div>
+
+                                <p>
+
+                                    {progress}% Funded
+
+                                </p>
+
+                                <br/>
+
+                                <button
+                                    onClick={() =>
+                                        navigate("/donate", {
+                                            state: { need }
+                                        })
+                                    }
+                                >
+
+                                    Donate ❤️
+
+                                </button>
+
+                            </div>
+
+                        );
+
+                    })
+
+                }
+
+            </div>
+
         </div>
+
     );
+
 }
 
 export default DonorDashboard;

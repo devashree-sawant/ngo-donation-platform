@@ -1,85 +1,152 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../api/axios";
+import "../App.css";
 
 function Donate() {
-    const location = useLocation();
+
     const navigate = useNavigate();
+    const location = useLocation();
 
     const need = location.state?.need;
 
     const [amount, setAmount] = useState("");
 
     if (!need) {
-        return <h2>No Need Selected</h2>;
+        return (
+            <div className="container">
+                <div className="card">
+                    <h2>No Campaign Selected</h2>
+                    <button onClick={() => navigate("/donor")}>
+                        Back
+                    </button>
+                </div>
+            </div>
+        );
     }
 
-    const handleDonate = async () => {
+    const donate = async () => {
+
+        if (!amount || Number(amount) <= 0) {
+            alert("Enter a valid amount");
+            return;
+        }
+
         try {
-            const token = localStorage.getItem("token");
 
-            // Change this if you store donorId differently
-            const donorId = localStorage.getItem("donorId");
+            await api.post("/contributions", {
 
-            const contribution = {
                 type: "MONEY",
-                amount: Number(amount),
-                itemName: null,
-                quantity: null,
-                donor: {
-                    id: donorId,
-                },
-                need: {
-                    id: need.id,
-                },
-            };
 
-            await api.post("/contributions", contribution, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+                amount: Number(amount),
+
+                donor: {
+                    id: Number(localStorage.getItem("id"))
                 },
+
+                need: {
+                    id: need.id
+                }
+
             });
 
-            alert("Donation Successful!");
-            navigate("/donor");
+            alert("Donation Successful ❤️");
+
+            navigate("/donor", { replace: true });
+
         } catch (err) {
-            console.error(err);
+
+            console.log(err);
+
             alert("Donation Failed");
+
         }
+
     };
 
+    const progress =
+        need.targetAmount
+            ? ((need.currentAmount / need.targetAmount) * 100).toFixed(1)
+            : 0;
+
     return (
-        <div style={{ padding: "20px" }}>
-            <h2>Donate</h2>
 
-            <h3>{need.title}</h3>
+        <div className="container">
 
-            <p>{need.description}</p>
+            <div className="card">
 
-            <p>Target Amount: {need.targetAmount}</p>
+                <h1>Donate</h1>
 
-            <p>Current Amount: {need.currentAmount}</p>
+                <h2>{need.title}</h2>
 
-            <input
-                type="number"
-                placeholder="Enter Amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-            />
+                <p>{need.description}</p>
 
-            <br />
-            <br />
+                <br />
 
-            <button onClick={handleDonate}>Donate</button>
+                <p>
 
-            <button
-                onClick={() => navigate("/donor")}
-                style={{ marginLeft: "10px" }}
-            >
-                Cancel
-            </button>
+                    <b>NGO:</b> {need.ngo?.name}
+
+                </p>
+
+                <br />
+
+                <p className="amount">
+
+                    ₹{need.currentAmount} / ₹{need.targetAmount}
+
+                </p>
+
+                <div className="progress">
+
+                    <div
+                        style={{
+                            width: `${progress}%`
+                        }}
+                    />
+
+                </div>
+
+                <p>
+
+                    {progress}% Funded
+
+                </p>
+
+                <br />
+
+                <input
+
+                    type="number"
+
+                    placeholder="Enter Donation Amount"
+
+                    value={amount}
+
+                    onChange={(e) => setAmount(e.target.value)}
+
+                />
+
+                <button
+                    onClick={donate}
+                    style={{ marginRight: "10px" }}
+                >
+                    Donate Now
+                </button>
+
+                <button
+                    className="logout"
+                    onClick={() => navigate("/donor")}
+                >
+                    Cancel
+                </button>
+
+            </div>
+
         </div>
+
     );
+
 }
 
 export default Donate;

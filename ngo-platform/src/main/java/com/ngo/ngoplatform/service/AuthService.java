@@ -25,7 +25,8 @@ public class AuthService {
         if (ngo != null && ngo.getPassword().equals(request.getPassword())) {
             return new AuthResponse(
                     jwtService.generateToken(ngo.getEmail()),
-                    "NGO"
+                    "NGO",
+                    ngo.getId()
             );
         }
 
@@ -34,7 +35,8 @@ public class AuthService {
         if (donor != null && donor.getPassword().equals(request.getPassword())) {
             return new AuthResponse(
                     jwtService.generateToken(donor.getEmail()),
-                    "DONOR"
+                    "DONOR",
+                    donor.getId()
             );
         }
 

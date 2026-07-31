@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ngo-donation-platform.iml" filepath="$PROJECT_DIR$/.idea/ngo-donation-platform.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ngo-platform/ngo-platform.iml" filepath="$PROJECT_DIR$/ngo-platform/ngo-platform.iml" />
     </modules>
   </component>
 </project>
