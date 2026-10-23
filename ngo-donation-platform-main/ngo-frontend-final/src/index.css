@@ -1,0 +1,17 @@
+/* Global reset: theme colors and typography are defined in App.css. */
+:root {
+  font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
+  color-scheme: dark;
+  color: #e4eee6;
+  background: #0d1410;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { min-width: 320px; background: #0d1410; }
+button, input, textarea, select { font: inherit; }
+a { color: inherit; }
